@@ -10,6 +10,5 @@ setup(name='mridata',
       scripts=['bin/mridata'],
       install_requires=[
           'requests',
-          'urllib',
       ]
 )
