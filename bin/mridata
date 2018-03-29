@@ -1,0 +1,32 @@
+#!/usr/bin/env python
+
+
+if __name__ == "__main__":
+    import argparse
+    import mridata
+
+    parser = argparse.ArgumentParser(prog='mridata')
+    subparsers = parser.add_subparsers(dest='command')
+    
+    upload_ge = subparsers.add_parser('upload_ge', description='Upload GE files.')
+    upload_ge.add_argument('--anatomy', type=str, default='Unknown')
+    upload_ge.add_argument('--fullysampled', type=str, default='Unknown')
+    upload_ge.add_argument('--references', type=str, default='')
+    upload_ge.add_argument('--comments', type=str, default='')
+    upload_ge.add_argument("files", type=str, nargs='+', help="Files.")
+    
+    upload_siemens = subparsers.add_parser('upload_siemens', description='Upload Siemens files.')
+    upload_siemens.add_argument('--anatomy', type=str, default='Unknown')
+    upload_siemens.add_argument('--fullysampled', type=str, default='Unknown')
+    upload_siemens.add_argument('--references', type=str, default='')
+    upload_siemens.add_argument('--comments', type=str, default='')
+    upload_siemens.add_argument("files", nargs='+', help="Files.")
+    
+    args = parser.parse_args()
+
+    if args.command == 'upload_ge':
+        mridata.upload_ge(*args.files, anatomy=args.anatomy, fullysampled=args.fullysampled,
+                          references=args.references, comments=args.comments)
+    elif args.command == 'upload_siemens':
+        mridata.upload_siemens(*args.files, anatomy=args.anatomy, fullysampled=args.fullysampled,
+                               references=args.references, comments=args.comments)
