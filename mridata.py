@@ -21,7 +21,10 @@ def login():
     csrftoken = session.cookies['csrftoken']
     login_data = {'username': username, 'password': password,
                   'csrfmiddlewaretoken': csrftoken}
-    session.post(LOGIN_URL, data=login_data)
+    p = session.post(LOGIN_URL, data=login_data)
+
+    if 'login'in p.url:
+        raise Exception('Cannot find user with the given credentials.')
 
 
 def upload_ge(*ge_files,
