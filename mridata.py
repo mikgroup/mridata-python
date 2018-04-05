@@ -1,12 +1,12 @@
 import getpass
 import requests
-import urllib.parse
+from urllib.parse import urljoin
 
 
 WEBSITE = 'http://mridata-web.us-west-2.elasticbeanstalk.com/'
-LOGIN_URL = urllib.parse.urljoin(WEBSITE, 'accounts/login/')
-UPLOAD_GE_URL = urllib.parse.urljoin(WEBSITE, 'upload_ge/')
-UPLOAD_SIEMENS_URL = urllib.parse.urljoin(WEBSITE, 'upload_siemens/')
+LOGIN_URL = urljoin(WEBSITE, 'accounts/login/')
+UPLOAD_GE_URL = urljoin(WEBSITE, 'upload_ge/')
+UPLOAD_SIEMENS_URL = urljoin(WEBSITE, 'upload_siemens/')
 
 session = None
 
