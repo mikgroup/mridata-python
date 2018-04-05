@@ -40,7 +40,7 @@ def upload_ismrmrd(ismrmrd_file,
     
     session.get(UPLOAD_ISMRMRD_URL)
     csrftoken = session.cookies['csrftoken']
-    files = [('ismrmrd_file', open(ismrmrd_file, 'rb'))]
+    files = {'ismrmrd_file': open(ismrmrd_file, 'rb')}
     upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
                    'references': references, 'comments': comments,
                    'csrfmiddlewaretoken': csrftoken}
@@ -60,7 +60,7 @@ def upload_ge(ge_file,
     
     session.get(UPLOAD_GE_URL)
     csrftoken = session.cookies['csrftoken']
-    files = [('ge_file', open(ge_file, 'rb'))]
+    files = {'ge_file': open(ge_file, 'rb')}
     upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
                    'references': references, 'comments': comments,
                    'csrfmiddlewaretoken': csrftoken}
@@ -80,7 +80,7 @@ def upload_siemens(siemens_dat_file,
     
     session.get(UPLOAD_SIEMENS_URL)
     csrftoken = session.cookies['csrftoken']
-    files = [('siemens_dat_file', open(siemens_dat_file, 'rb'))]
+    files = {'siemens_dat_file': open(siemens_dat_file, 'rb')}
     upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
                    'references': references, 'comments': comments,
                    'csrfmiddlewaretoken': csrftoken}
@@ -104,9 +104,9 @@ def upload_philips(philips_basename,
     
     session.get(UPLOAD_PHILIPS_URL)
     csrftoken = session.cookies['csrftoken']
-    files = [('philips_lab_file', open(philips_lab_file, 'rb'),
-              'philips_sin_file', open(philips_sin_file, 'rb'),
-              'philips_raw_file', open(philips_raw_file, 'rb'))]
+    files = {'philips_lab_file': open(philips_lab_file, 'rb'),
+             'philips_sin_file': open(philips_sin_file, 'rb'),
+             'philips_raw_file': open(philips_raw_file, 'rb')}
     upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
                    'references': references, 'comments': comments,
                    'csrfmiddlewaretoken': csrftoken}
