@@ -7,6 +7,8 @@ WEBSITE = 'http://mridata-web.us-west-2.elasticbeanstalk.com/'
 LOGIN_URL = urljoin(WEBSITE, 'accounts/login/')
 UPLOAD_GE_URL = urljoin(WEBSITE, 'upload_ge/')
 UPLOAD_SIEMENS_URL = urljoin(WEBSITE, 'upload_siemens/')
+UPLOAD_PHILIPS_URL = urljoin(WEBSITE, 'upload_philips/')
+UPLOAD_ISMRMRD_URL = urljoin(WEBSITE, 'upload_ismrmrd/')
 
 session = None
 
@@ -27,7 +29,27 @@ def login():
         raise Exception('Cannot find user with the given credentials.')
 
 
-def upload_ge(*ge_files,
+def upload_ismrmrd(ismrmrd_file,
+                   anatomy='Unknown', fullysampled=None,
+                   references='', comments=''):
+
+    if session is None:
+        login()
+
+    print('Uploading...')
+    
+    session.get(UPLOAD_ISMRMRD_URL)
+    csrftoken = session.cookies['csrftoken']
+    files = [('ismrmrd_file', open(ismrmrd_file, 'rb'))]
+    upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
+                   'references': references, 'comments': comments,
+                   'csrfmiddlewaretoken': csrftoken}
+    session.post(UPLOAD_ISMRMRD_URL, files=files, data=upload_data)
+    
+    print('Done.')
+
+
+def upload_ge(ge_file,
               anatomy='Unknown', fullysampled=None,
               references='', comments=''):
 
@@ -38,8 +60,7 @@ def upload_ge(*ge_files,
     
     session.get(UPLOAD_GE_URL)
     csrftoken = session.cookies['csrftoken']
-    files = [('ge_file', open(ge_file, 'rb'))
-             for ge_file in ge_files]
+    files = [('ge_file', open(ge_file, 'rb'))]
     upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
                    'references': references, 'comments': comments,
                    'csrfmiddlewaretoken': csrftoken}
@@ -48,8 +69,7 @@ def upload_ge(*ge_files,
     print('Done.')
 
 
-
-def upload_siemens(*siemens_dat_files,
+def upload_siemens(siemens_dat_file,
                    anatomy='Unknown', fullysampled=None,
                    references='', comments=''):
 
@@ -60,11 +80,36 @@ def upload_siemens(*siemens_dat_files,
     
     session.get(UPLOAD_SIEMENS_URL)
     csrftoken = session.cookies['csrftoken']
-    files = [('siemens_dat_file', open(siemens_dat_file, 'rb'))
-             for siemens_dat_file in siemens_dat_files]
+    files = [('siemens_dat_file', open(siemens_dat_file, 'rb'))]
     upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
                    'references': references, 'comments': comments,
                    'csrfmiddlewaretoken': csrftoken}
     session.post(UPLOAD_SIEMENS_URL, files=files, data=upload_data)
+    
+    print('Done.')
+
+
+def upload_philips(philips_basename,
+                   anatomy='Unknown', fullysampled=None,
+                   references='', comments=''):
+
+    if session is None:
+        login()
+
+    philips_lab_file = philips_basename + '.lab'
+    philips_sin_file = philips_basename + '.sin'
+    philips_raw_file = philips_basename + '.raw'
+
+    print('Uploading...')
+    
+    session.get(UPLOAD_PHILIPS_URL)
+    csrftoken = session.cookies['csrftoken']
+    files = [('philips_lab_file', open(philips_lab_file, 'rb'),
+              'philips_sin_file', open(philips_sin_file, 'rb'),
+              'philips_raw_file', open(philips_raw_file, 'rb'))]
+    upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
+                   'references': references, 'comments': comments,
+                   'csrfmiddlewaretoken': csrftoken}
+    session.post(UPLOAD_PHILIPS_URL, files=files, data=upload_data)
     
     print('Done.')
