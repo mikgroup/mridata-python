@@ -33,6 +33,8 @@ def upload_ge(*ge_files,
 
     if session is None:
         login()
+
+    print('Uploading...')
     
     session.get(UPLOAD_GE_URL)
     csrftoken = session.cookies['csrftoken']
@@ -42,6 +44,8 @@ def upload_ge(*ge_files,
                    'references': references, 'comments': comments,
                    'csrfmiddlewaretoken': csrftoken}
     session.post(UPLOAD_GE_URL, files=files, data=upload_data)
+    
+    print('Done.')
 
 
 
@@ -52,6 +56,8 @@ def upload_siemens(*siemens_dat_files,
     if session is None:
         login()
 
+    print('Uploading...')
+    
     session.get(UPLOAD_SIEMENS_URL)
     csrftoken = session.cookies['csrftoken']
     files = [('siemens_dat_file', open(siemens_dat_file, 'rb'))
@@ -60,3 +66,5 @@ def upload_siemens(*siemens_dat_files,
                    'references': references, 'comments': comments,
                    'csrfmiddlewaretoken': csrftoken}
     session.post(UPLOAD_SIEMENS_URL, files=files, data=upload_data)
+    
+    print('Done.')
