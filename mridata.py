@@ -29,7 +29,7 @@ def login():
         raise Exception('Cannot find user with the given credentials.')
 
 
-def upload_ismrmrd(ismrmrd_file,
+def upload_ismrmrd(ismrmrd_file, project_name,
                    anatomy='Unknown', fullysampled=None,
                    references='', comments=''):
 
@@ -42,6 +42,7 @@ def upload_ismrmrd(ismrmrd_file,
     csrftoken = session.cookies['csrftoken']
     files = {'ismrmrd_file': open(ismrmrd_file, 'rb')}
     upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
+                   'project_name': project_name,
                    'references': references, 'comments': comments,
                    'csrfmiddlewaretoken': csrftoken}
     session.post(UPLOAD_ISMRMRD_URL, files=files, data=upload_data)
@@ -49,7 +50,7 @@ def upload_ismrmrd(ismrmrd_file,
     print('Done.')
 
 
-def upload_ge(ge_file,
+def upload_ge(ge_file, project_name,
               anatomy='Unknown', fullysampled=None,
               references='', comments='',
               thumbnail_horizontal_flip=False,
@@ -66,6 +67,7 @@ def upload_ge(ge_file,
     csrftoken = session.cookies['csrftoken']
     files = {'ge_file': open(ge_file, 'rb')}
     upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
+                   'project_name': project_name,
                    'references': references, 'comments': comments,
                    'thumbnail_fftshift_along_z': thumbnail_fftshift_along_z,
                    'thumbnail_horizontal_flip': thumbnail_horizontal_flip,
@@ -77,7 +79,7 @@ def upload_ge(ge_file,
     print('Done.')
 
 
-def upload_siemens(siemens_dat_file,
+def upload_siemens(siemens_dat_file, project_name,
                    anatomy='Unknown', fullysampled=None,
                    references='', comments='',
                    thumbnail_horizontal_flip=False,
@@ -94,6 +96,7 @@ def upload_siemens(siemens_dat_file,
     csrftoken = session.cookies['csrftoken']
     files = {'siemens_dat_file': open(siemens_dat_file, 'rb')}
     upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
+                   'project_name': project_name,
                    'references': references, 'comments': comments,
                    'thumbnail_fftshift_along_z': thumbnail_fftshift_along_z,
                    'thumbnail_horizontal_flip': thumbnail_horizontal_flip,
@@ -105,7 +108,7 @@ def upload_siemens(siemens_dat_file,
     print('Done.')
 
 
-def upload_philips(philips_basename,
+def upload_philips(philips_basename, project_name,
                    anatomy='Unknown', fullysampled=None,
                    references='', comments='',
                    thumbnail_horizontal_flip=False,
@@ -128,6 +131,7 @@ def upload_philips(philips_basename,
              'philips_sin_file': open(philips_sin_file, 'rb'),
              'philips_raw_file': open(philips_raw_file, 'rb')}
     upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
+                   'project_name': project_name,
                    'references': references, 'comments': comments,
                    'thumbnail_fftshift_along_z': thumbnail_fftshift_along_z,
                    'thumbnail_horizontal_flip': thumbnail_horizontal_flip,
