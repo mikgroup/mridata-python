@@ -51,7 +51,11 @@ def upload_ismrmrd(ismrmrd_file,
 
 def upload_ge(ge_file,
               anatomy='Unknown', fullysampled=None,
-              references='', comments=''):
+              references='', comments='',
+              thumbnail_horizontal_flip=False,
+              thumbnail_vertical_flip=False,
+              thumbnail_transpose=False,
+              thumbnail_fftshift_along_z=False):
 
     if session is None:
         login()
@@ -63,6 +67,10 @@ def upload_ge(ge_file,
     files = {'ge_file': open(ge_file, 'rb')}
     upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
                    'references': references, 'comments': comments,
+                   'thumbnail_fftshift_along_z': thumbnail_fftshift_along_z,
+                   'thumbnail_horizontal_flip': thumbnail_horizontal_flip,
+                   'thumbnail_transpose': thumbnail_transpose,
+                   'thumbnail_vertical_flip': thumbnail_vertical_flip,
                    'csrfmiddlewaretoken': csrftoken}
     session.post(UPLOAD_GE_URL, files=files, data=upload_data)
     
@@ -71,7 +79,11 @@ def upload_ge(ge_file,
 
 def upload_siemens(siemens_dat_file,
                    anatomy='Unknown', fullysampled=None,
-                   references='', comments=''):
+                   references='', comments='',
+                   thumbnail_horizontal_flip=False,
+                   thumbnail_vertical_flip=False,
+                   thumbnail_transpose=False,
+                   thumbnail_fftshift_along_z=False):
 
     if session is None:
         login()
@@ -83,6 +95,10 @@ def upload_siemens(siemens_dat_file,
     files = {'siemens_dat_file': open(siemens_dat_file, 'rb')}
     upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
                    'references': references, 'comments': comments,
+                   'thumbnail_fftshift_along_z': thumbnail_fftshift_along_z,
+                   'thumbnail_horizontal_flip': thumbnail_horizontal_flip,
+                   'thumbnail_transpose': thumbnail_transpose,
+                   'thumbnail_vertical_flip': thumbnail_vertical_flip,
                    'csrfmiddlewaretoken': csrftoken}
     session.post(UPLOAD_SIEMENS_URL, files=files, data=upload_data)
     
@@ -91,7 +107,11 @@ def upload_siemens(siemens_dat_file,
 
 def upload_philips(philips_basename,
                    anatomy='Unknown', fullysampled=None,
-                   references='', comments=''):
+                   references='', comments='',
+                   thumbnail_horizontal_flip=False,
+                   thumbnail_vertical_flip=False,
+                   thumbnail_transpose=False,
+                   thumbnail_fftshift_along_z=False):
 
     if session is None:
         login()
@@ -109,6 +129,10 @@ def upload_philips(philips_basename,
              'philips_raw_file': open(philips_raw_file, 'rb')}
     upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
                    'references': references, 'comments': comments,
+                   'thumbnail_fftshift_along_z': thumbnail_fftshift_along_z,
+                   'thumbnail_horizontal_flip': thumbnail_horizontal_flip,
+                   'thumbnail_transpose': thumbnail_transpose,
+                   'thumbnail_vertical_flip': thumbnail_vertical_flip,
                    'csrfmiddlewaretoken': csrftoken}
     session.post(UPLOAD_PHILIPS_URL, files=files, data=upload_data)
     
