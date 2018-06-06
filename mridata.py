@@ -13,10 +13,9 @@ UPLOAD_ISMRMRD_URL = urljoin(WEBSITE, 'upload_ismrmrd/')
 session = None
 
 
-def login():
+def login(username, password):
+
     global session
-    username = input('Username: ')
-    password = getpass.getpass('Password: ')
 
     session = requests.Session()
     session.get(LOGIN_URL)
@@ -31,12 +30,16 @@ def login():
 
 def upload_ismrmrd(ismrmrd_file, project_name,
                    anatomy='Unknown', fullysampled=None,
-                   references='', comments=''):
+                   references='', comments='',
+                   thumbnail_horizontal_flip=False,
+                   thumbnail_vertical_flip=False,
+                   thumbnail_transpose=False,
+                   thumbnail_fftshift_along_z=False):
 
     if session is None:
-        login()
+        raise Exception('Must login first.')
 
-    print('Uploading...')
+    print('Uploading {}...'.format(ismrmrd_file))
     
     session.get(UPLOAD_ISMRMRD_URL)
     csrftoken = session.cookies['csrftoken']
@@ -44,10 +47,14 @@ def upload_ismrmrd(ismrmrd_file, project_name,
     upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
                    'project_name': project_name,
                    'references': references, 'comments': comments,
+                   'thumbnail_fftshift_along_z': thumbnail_fftshift_along_z,
+                   'thumbnail_horizontal_flip': thumbnail_horizontal_flip,
+                   'thumbnail_transpose': thumbnail_transpose,
+                   'thumbnail_vertical_flip': thumbnail_vertical_flip,
                    'csrfmiddlewaretoken': csrftoken}
     session.post(UPLOAD_ISMRMRD_URL, files=files, data=upload_data)
     
-    print('Done.')
+    print('Upload successful.')
 
 
 def upload_ge(ge_file, project_name,
@@ -57,11 +64,11 @@ def upload_ge(ge_file, project_name,
               thumbnail_vertical_flip=False,
               thumbnail_transpose=False,
               thumbnail_fftshift_along_z=False):
-
+    
     if session is None:
-        login()
+        raise Exception('Must login first.')
 
-    print('Uploading...')
+    print('Uploading {}...'.format(ge_file))
     
     session.get(UPLOAD_GE_URL)
     csrftoken = session.cookies['csrftoken']
@@ -76,7 +83,7 @@ def upload_ge(ge_file, project_name,
                    'csrfmiddlewaretoken': csrftoken}
     session.post(UPLOAD_GE_URL, files=files, data=upload_data)
     
-    print('Done.')
+    print('Upload successful.')
 
 
 def upload_siemens(siemens_dat_file, project_name,
@@ -88,9 +95,9 @@ def upload_siemens(siemens_dat_file, project_name,
                    thumbnail_fftshift_along_z=False):
 
     if session is None:
-        login()
+        raise Exception('Must login first.')
 
-    print('Uploading...')
+    print('Uploading {}...'.format(siemens_dat_file))
     
     session.get(UPLOAD_SIEMENS_URL)
     csrftoken = session.cookies['csrftoken']
@@ -105,7 +112,7 @@ def upload_siemens(siemens_dat_file, project_name,
                    'csrfmiddlewaretoken': csrftoken}
     session.post(UPLOAD_SIEMENS_URL, files=files, data=upload_data)
     
-    print('Done.')
+    print('Upload successful.')
 
 
 def upload_philips(philips_basename, project_name,
@@ -117,13 +124,13 @@ def upload_philips(philips_basename, project_name,
                    thumbnail_fftshift_along_z=False):
 
     if session is None:
-        login()
-
+        raise Exception('Must login first.')
+    
     philips_lab_file = philips_basename + '.lab'
     philips_sin_file = philips_basename + '.sin'
     philips_raw_file = philips_basename + '.raw'
 
-    print('Uploading...')
+    print('Uploading {}...'.format(philips_basename))
     
     session.get(UPLOAD_PHILIPS_URL)
     csrftoken = session.cookies['csrftoken']
@@ -140,4 +147,4 @@ def upload_philips(philips_basename, project_name,
                    'csrfmiddlewaretoken': csrftoken}
     session.post(UPLOAD_PHILIPS_URL, files=files, data=upload_data)
     
-    print('Done.')
+    print('Upload successful.')

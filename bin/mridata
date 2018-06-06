@@ -9,6 +9,9 @@ if __name__ == "__main__":
     subparsers = parser.add_subparsers(dest='command')
     
     upload_ge = subparsers.add_parser('upload_ge', description='Upload GE files.')
+    upload_ge.add_argument('--username', type=str, required=True)
+    upload_ge.add_argument('--password', type=str, required=True)
+    upload_ge.add_argument('--project_name', type=str, required=True)
     upload_ge.add_argument('--anatomy', type=str, default='Unknown')
     upload_ge.add_argument('--fullysampled', type=str, default='Unknown')
     upload_ge.add_argument('--references', type=str, default='')
@@ -16,6 +19,9 @@ if __name__ == "__main__":
     upload_ge.add_argument("filename", type=str, help="Filename.")
     
     upload_siemens = subparsers.add_parser('upload_siemens', description='Upload Siemens files.')
+    upload_siemens.add_argument('--username', type=str, required=True)
+    upload_siemens.add_argument('--password', type=str, required=True)
+    upload_siemens.add_argument('--project_name', type=str, required=True)
     upload_siemens.add_argument('--anatomy', type=str, default='Unknown')
     upload_siemens.add_argument('--fullysampled', type=str, default='Unknown')
     upload_siemens.add_argument('--references', type=str, default='')
@@ -23,6 +29,9 @@ if __name__ == "__main__":
     upload_siemens.add_argument("filename", help="Filename.")
     
     upload_philips = subparsers.add_parser('upload_philips', description='Upload Philips files.')
+    upload_philips.add_argument('--username', type=str, required=True)
+    upload_philips.add_argument('--password', type=str, required=True)
+    upload_philips.add_argument('--project_name', type=str, required=True)
     upload_philips.add_argument('--anatomy', type=str, default='Unknown')
     upload_philips.add_argument('--fullysampled', type=str, default='Unknown')
     upload_philips.add_argument('--references', type=str, default='')
@@ -30,6 +39,9 @@ if __name__ == "__main__":
     upload_philips.add_argument("basename", help="File basename.")
     
     upload_ismrmrd = subparsers.add_parser('upload_ismrmrd', description='Upload Ismrmrd files.')
+    upload_ismrmrd.add_argument('--username', type=str, required=True)
+    upload_ismrmrd.add_argument('--password', type=str, required=True)
+    upload_ismrmrd.add_argument('--project_name', type=str, required=True)
     upload_ismrmrd.add_argument('--anatomy', type=str, default='Unknown')
     upload_ismrmrd.add_argument('--fullysampled', type=str, default='Unknown')
     upload_ismrmrd.add_argument('--references', type=str, default='')
@@ -39,17 +51,25 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.command == 'upload_ge':
-        mridata.upload_ge(args.filename, anatomy=args.anatomy, fullysampled=args.fullysampled,
+        mridata.login(args.username, args.password)
+        mridata.upload_ge(args.filename, args.project_name,
+                          anatomy=args.anatomy, fullysampled=args.fullysampled,
                           references=args.references, comments=args.comments)
         
     elif args.command == 'upload_siemens':
-        mridata.upload_siemens(args.filename, anatomy=args.anatomy, fullysampled=args.fullysampled,
+        mridata.login(args.username, args.password)
+        mridata.upload_siemens(args.filename, args.project_name,
+                               anatomy=args.anatomy, fullysampled=args.fullysampled,
                                references=args.references, comments=args.comments)
 
     elif args.command == 'upload_philips':
-        mridata.upload_philips(args.filename, anatomy=args.anatomy, fullysampled=args.fullysampled,
+        mridata.login(args.username, args.password)
+        mridata.upload_philips(args.filename, args.project_name,
+                               anatomy=args.anatomy, fullysampled=args.fullysampled,
                                references=args.references, comments=args.comments)
 
     elif args.command == 'upload_ismrmrd':
-        mridata.upload_ismrmrd(args.filename, anatomy=args.anatomy, fullysampled=args.fullysampled,
+        mridata.login(args.username, args.password)
+        mridata.upload_ismrmrd(args.filename, args.project_name,
+                               anatomy=args.anatomy, fullysampled=args.fullysampled,
                                references=args.references, comments=args.comments)
