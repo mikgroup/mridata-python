@@ -16,6 +16,7 @@ if __name__ == "__main__":
     upload_ge.add_argument('--fullysampled', type=str, default='Unknown')
     upload_ge.add_argument('--references', type=str, default='')
     upload_ge.add_argument('--comments', type=str, default='')
+    upload_ge.add_argument('--funding_support', type=str, default='')
     upload_ge.add_argument("filename", type=str, help="Filename.")
     
     upload_siemens = subparsers.add_parser('upload_siemens', description='Upload Siemens files.')
@@ -26,6 +27,7 @@ if __name__ == "__main__":
     upload_siemens.add_argument('--fullysampled', type=str, default='Unknown')
     upload_siemens.add_argument('--references', type=str, default='')
     upload_siemens.add_argument('--comments', type=str, default='')
+    upload_siemens.add_argument('--funding_support', type=str, default='')
     upload_siemens.add_argument("filename", help="Filename.")
     
     upload_philips = subparsers.add_parser('upload_philips', description='Upload Philips files.')
@@ -36,6 +38,7 @@ if __name__ == "__main__":
     upload_philips.add_argument('--fullysampled', type=str, default='Unknown')
     upload_philips.add_argument('--references', type=str, default='')
     upload_philips.add_argument('--comments', type=str, default='')
+    upload_philips.add_argument('--funding_support', type=str, default='')
     upload_philips.add_argument("basename", help="File basename.")
     
     upload_ismrmrd = subparsers.add_parser('upload_ismrmrd', description='Upload Ismrmrd files.')
@@ -46,30 +49,43 @@ if __name__ == "__main__":
     upload_ismrmrd.add_argument('--fullysampled', type=str, default='Unknown')
     upload_ismrmrd.add_argument('--references', type=str, default='')
     upload_ismrmrd.add_argument('--comments', type=str, default='')
+    upload_ismrmrd.add_argument('--funding_support', type=str, default='')
     upload_ismrmrd.add_argument("filename", help="Filename.")
     
     args = parser.parse_args()
 
     if args.command == 'upload_ge':
         mridata.login(args.username, args.password)
-        mridata.upload_ge(args.filename, args.project_name,
-                          anatomy=args.anatomy, fullysampled=args.fullysampled,
-                          references=args.references, comments=args.comments)
+        mridata.upload_ge(
+            args.filename, args.project_name,
+            anatomy=args.anatomy, fullysampled=args.fullysampled,
+            references=args.references, comments=args.comments,
+            funding_support=args.funding_support
+        )
         
     elif args.command == 'upload_siemens':
         mridata.login(args.username, args.password)
-        mridata.upload_siemens(args.filename, args.project_name,
-                               anatomy=args.anatomy, fullysampled=args.fullysampled,
-                               references=args.references, comments=args.comments)
+        mridata.upload_siemens(
+            args.filename, args.project_name,
+            anatomy=args.anatomy, fullysampled=args.fullysampled,
+            references=args.references, comments=args.comments,
+            funding_support=args.funding_support
+        )
 
     elif args.command == 'upload_philips':
         mridata.login(args.username, args.password)
-        mridata.upload_philips(args.filename, args.project_name,
-                               anatomy=args.anatomy, fullysampled=args.fullysampled,
-                               references=args.references, comments=args.comments)
+        mridata.upload_philips(
+            args.filename, args.project_name,
+            anatomy=args.anatomy, fullysampled=args.fullysampled,
+            references=args.references, comments=args.comments,
+            funding_support=args.funding_support
+        )
 
     elif args.command == 'upload_ismrmrd':
         mridata.login(args.username, args.password)
-        mridata.upload_ismrmrd(args.filename, args.project_name,
-                               anatomy=args.anatomy, fullysampled=args.fullysampled,
-                               references=args.references, comments=args.comments)
+        mridata.upload_ismrmrd(
+            args.filename, args.project_name,
+            anatomy=args.anatomy, fullysampled=args.fullysampled,
+            references=args.references, comments=args.comments,
+            funding_support=args.funding_support
+        )

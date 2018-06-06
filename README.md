@@ -20,6 +20,8 @@ After installing, you can upload to mridata directly from command line.
 
 To upload GE dataset for example
 
-	mridata upload_ge --anatomy Knee --fullysampled True P123456.7
+	mridata upload_ge --username USERNAME --password PASSWORD --project_name PROJECT_NAME --anatomy Knee --fullysampled True P123456.7
+	
+A list of uploading options can be viewed using the command:
 
-The program will prompt you for username and password.
+	mridata upload -h
