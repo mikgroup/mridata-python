@@ -4,7 +4,9 @@ This is a python package for downloading and uploading datasets to mridata.org
 
 Requirements
 ============
-This package requires requests.
+This package requires requests. You can install using pip:
+
+	pip install requests
 
 Installation
 ============
