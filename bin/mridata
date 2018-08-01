@@ -55,8 +55,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     if args.command == 'upload_ge':
-        mridata.login(args.username, args.password)
         mridata.upload_ge(
+            args.username, args.password,
             args.filename, args.project_name,
             anatomy=args.anatomy, fullysampled=args.fullysampled,
             references=args.references, comments=args.comments,
@@ -64,8 +64,8 @@ if __name__ == "__main__":
         )
         
     elif args.command == 'upload_siemens':
-        mridata.login(args.username, args.password)
         mridata.upload_siemens(
+            args.username, args.password,
             args.filename, args.project_name,
             anatomy=args.anatomy, fullysampled=args.fullysampled,
             references=args.references, comments=args.comments,
@@ -73,8 +73,8 @@ if __name__ == "__main__":
         )
 
     elif args.command == 'upload_philips':
-        mridata.login(args.username, args.password)
         mridata.upload_philips(
+            args.username, args.password,
             args.filename, args.project_name,
             anatomy=args.anatomy, fullysampled=args.fullysampled,
             references=args.references, comments=args.comments,
@@ -82,8 +82,8 @@ if __name__ == "__main__":
         )
 
     elif args.command == 'upload_ismrmrd':
-        mridata.login(args.username, args.password)
         mridata.upload_ismrmrd(
+            args.username, args.password,
             args.filename, args.project_name,
             anatomy=args.anatomy, fullysampled=args.fullysampled,
             references=args.references, comments=args.comments,

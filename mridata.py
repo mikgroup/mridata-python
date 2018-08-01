@@ -1,4 +1,3 @@
-import getpass
 import requests
 from urllib.parse import urljoin
 
@@ -10,12 +9,14 @@ UPLOAD_SIEMENS_URL = urljoin(WEBSITE, 'upload_siemens/')
 UPLOAD_PHILIPS_URL = urljoin(WEBSITE, 'upload_philips/')
 UPLOAD_ISMRMRD_URL = urljoin(WEBSITE, 'upload_ismrmrd/')
 
-session = None
-
 
 def login(username, password):
 
-    global session
+    if not username:
+        username = input('Enter your user name:')
+        
+    if not password:
+        password = input('Enter your password:')
 
     session = requests.Session()
     session.get(LOGIN_URL)
@@ -27,8 +28,20 @@ def login(username, password):
     if 'login'in p.url:
         raise Exception('Cannot find user with the given credentials.')
 
+    return session
 
-def upload_ismrmrd(ismrmrd_file, project_name,
+
+def download(uuid):
+    
+    r = requests.get(urljoin(WEBSITE, 'data/{}/download'.format(uuid)), stream=True)
+    with open('{}.h5'.format(uuid), 'wb') as f:
+        for chunk in r.iter_content(chunk_size=1024): 
+            if chunk:
+                f.write(chunk)    
+
+
+def upload_ismrmrd(username, password,
+                   ismrmrd_file, project_name,
                    anatomy='Unknown', fullysampled=None,
                    references='', comments='', funding_support='',
                    thumbnail_horizontal_flip=False,
@@ -36,11 +49,12 @@ def upload_ismrmrd(ismrmrd_file, project_name,
                    thumbnail_transpose=False,
                    thumbnail_fftshift_along_z=False):
 
-    if session is None:
-        raise Exception('Must login first.')
-
     print('Uploading {}...'.format(ismrmrd_file))
-    
+
+    session = login(username, password)
+    if not project_name:
+        project_name = input('Enter your project name:')
+        
     session.get(UPLOAD_ISMRMRD_URL)
     csrftoken = session.cookies['csrftoken']
     files = {'ismrmrd_file': open(ismrmrd_file, 'rb')}
@@ -58,19 +72,21 @@ def upload_ismrmrd(ismrmrd_file, project_name,
     print('Upload successful.')
 
 
-def upload_ge(ge_file, project_name,
+def upload_ge(username, password,
+              ge_file, project_name,
               anatomy='Unknown', fullysampled=None,
               references='', comments='', funding_support='',
               thumbnail_horizontal_flip=False,
               thumbnail_vertical_flip=False,
               thumbnail_transpose=False,
               thumbnail_fftshift_along_z=False):
-    
-    if session is None:
-        raise Exception('Must login first.')
 
     print('Uploading {}...'.format(ge_file))
     
+    session = login(username, password)
+    if not project_name:
+        project_name = input('Enter your project name:')
+        
     session.get(UPLOAD_GE_URL)
     csrftoken = session.cookies['csrftoken']
     files = {'ge_file': open(ge_file, 'rb')}
@@ -88,7 +104,8 @@ def upload_ge(ge_file, project_name,
     print('Upload successful.')
 
 
-def upload_siemens(siemens_dat_file, project_name,
+def upload_siemens(username, password,
+                   siemens_dat_file, project_name,
                    anatomy='Unknown', fullysampled=None,
                    references='', comments='', funding_support='',
                    thumbnail_horizontal_flip=False,
@@ -96,11 +113,12 @@ def upload_siemens(siemens_dat_file, project_name,
                    thumbnail_transpose=False,
                    thumbnail_fftshift_along_z=False):
 
-    if session is None:
-        raise Exception('Must login first.')
-
     print('Uploading {}...'.format(siemens_dat_file))
     
+    session = login(username, password)
+    if not project_name:
+        project_name = input('Enter your project name:')
+        
     session.get(UPLOAD_SIEMENS_URL)
     csrftoken = session.cookies['csrftoken']
     files = {'siemens_dat_file': open(siemens_dat_file, 'rb')}
@@ -118,16 +136,14 @@ def upload_siemens(siemens_dat_file, project_name,
     print('Upload successful.')
 
 
-def upload_philips(philips_basename, project_name,
+def upload_philips(username, password,
+                   philips_basename, project_name,
                    anatomy='Unknown', fullysampled=None,
                    references='', comments='', funding_support='',
                    thumbnail_horizontal_flip=False,
                    thumbnail_vertical_flip=False,
                    thumbnail_transpose=False,
                    thumbnail_fftshift_along_z=False):
-
-    if session is None:
-        raise Exception('Must login first.')
     
     philips_lab_file = philips_basename + '.lab'
     philips_sin_file = philips_basename + '.sin'
@@ -135,6 +151,10 @@ def upload_philips(philips_basename, project_name,
 
     print('Uploading {}...'.format(philips_basename))
     
+    session = login(username, password)
+    if not project_name:
+        project_name = input('Enter your project name:')
+        
     session.get(UPLOAD_PHILIPS_URL)
     csrftoken = session.cookies['csrftoken']
     files = {'philips_lab_file': open(philips_lab_file, 'rb'),
