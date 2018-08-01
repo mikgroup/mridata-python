@@ -8,6 +8,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(prog='mridata')
     subparsers = parser.add_subparsers(dest='command')
     
+    upload_ge = subparsers.add_parser('download',
+                                      description='Download ISMRMRD files from mridata.org.')
+    upload_ge.add_argument("uuid", type=str, help="UUID.")
+    
     upload_ge = subparsers.add_parser('upload_ge', description='Upload GE files.')
     upload_ge.add_argument('--username', type=str, default='')
     upload_ge.add_argument('--password', type=str, default='')
@@ -54,7 +58,9 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
 
-    if args.command == 'upload_ge':
+    if args.command == 'download':
+        mridata.download(args.uuid)
+    elif args.command == 'upload_ge':
         mridata.upload_ge(
             args.username, args.password,
             args.filename, args.project_name,
@@ -89,3 +95,5 @@ if __name__ == "__main__":
             references=args.references, comments=args.comments,
             funding_support=args.funding_support
         )
+    else:
+        parser.print_help()
