@@ -142,7 +142,7 @@ def upload_ge(username, password,
                    'thumbnail_transpose': thumbnail_transpose,
                    'thumbnail_vertical_flip': thumbnail_vertical_flip,
                    'csrfmiddlewaretoken': csrftoken}
-    p = session.post(UPLOAD_GE_URL, files=files, data=upload_data)
+    p = session.post(UPLOAD_GE_URL, data=upload_data)
 
 
 def upload_siemens(username, password,
@@ -175,7 +175,7 @@ def upload_siemens(username, password,
                    'thumbnail_transpose': thumbnail_transpose,
                    'thumbnail_vertical_flip': thumbnail_vertical_flip,
                    'csrfmiddlewaretoken': csrftoken}
-    p = session.post(UPLOAD_SIEMENS_URL, files=files, data=upload_data)
+    p = session.post(UPLOAD_SIEMENS_URL, data=upload_data)
 
     
 def upload_philips(username, password,
@@ -216,4 +216,4 @@ def upload_philips(username, password,
                    'thumbnail_transpose': thumbnail_transpose,
                    'thumbnail_vertical_flip': thumbnail_vertical_flip,
                    'csrfmiddlewaretoken': csrftoken}
-    p = session.post(UPLOAD_PHILIPS_URL, files=files, data=upload_data)
+    p = session.post(UPLOAD_PHILIPS_URL, data=upload_data)
