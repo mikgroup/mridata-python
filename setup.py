@@ -13,6 +13,7 @@ setup(name='mridata',
           'boto3',
           'tqdm',
           'json',
-          'urllib'
+          'urllib',
+          'getpass'
       ]
 )

@@ -1,3 +1,4 @@
+import getpass
 import boto3
 from boto3.s3.transfer import S3Transfer
 import os
@@ -88,11 +89,11 @@ def upload_ismrmrd(username, password,
                    thumbnail_transpose=False):
 
     if not username:
-        username = input('Enter your user name:')
+        username = input('Enter your user name: ')
     if not password:
-        password = input('Enter your password:')
+        password = getpass.getpass('Enter your password: ')
     if not project_name:
-        project_name = input('Enter your project name:')
+        project_name = input('Enter your project name: ')
 
     print('Uploading {}...'.format(ismrmrd_file))
     session = login(username, password)
@@ -121,11 +122,11 @@ def upload_ge(username, password,
               thumbnail_transpose=False):
 
     if not username:
-        username = input('Enter your user name:')
+        username = input('Enter your user name: ')
     if not password:
-        password = input('Enter your password:')
+        password = getpass.getpass('Enter your password: ')
     if not project_name:
-        project_name = input('Enter your project name:')
+        project_name = input('Enter your project name: ')
 
     print('Uploading {}...'.format(ge_file))
     session = login(username, password)
@@ -154,11 +155,11 @@ def upload_siemens(username, password,
                    thumbnail_transpose=False):
 
     if not username:
-        username = input('Enter your user name:')
+        username = input('Enter your user name: ')
     if not password:
-        password = input('Enter your password:')
+        password = getpass.getpass('Enter your password: ')
     if not project_name:
-        project_name = input('Enter your project name:')
+        project_name = input('Enter your project name: ')
 
     print('Uploading {}...'.format(siemens_dat_file))
     session = login(username, password)
@@ -191,11 +192,11 @@ def upload_philips(username, password,
     philips_raw_file = philips_basename + '.raw'
     
     if not username:
-        username = input('Enter your user name:')
+        username = input('Enter your user name: ')
     if not password:
-        password = input('Enter your password:')
+        password = getpass.getpass('Enter your password: ')
     if not project_name:
-        project_name = input('Enter your project name:')
+        project_name = input('Enter your project name: ')
 
     print('Uploading {} {} {}...'.format(philips_lab_file, philips_sin_file, philips_raw_file))
     session = login(username, password)
