@@ -70,7 +70,7 @@ def upload_file_to_s3(session, filename):
         aws_session_token=credentials['SessionToken'],
     )
     transfer = S3Transfer(client)
-    s3_filename = os.path.join(S3_FOLDER, str(time.time() * 1000) + filename)
+    s3_filename = os.path.join(S3_FOLDER, '{}_{}'.format(time.time() * 1000, filename))
 
     with tqdm(total=os.path.getsize(filename), unit='B', unit_scale=True) as t:
         transfer.upload_file(filename, S3_BUCKET, s3_filename,
