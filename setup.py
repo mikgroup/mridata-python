@@ -10,5 +10,9 @@ setup(name='mridata',
       scripts=['bin/mridata'],
       install_requires=[
           'requests',
+          'boto3',
+          'tqdm',
+          'json',
+          'urllib'
       ]
 )

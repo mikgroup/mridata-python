@@ -1,15 +1,24 @@
-import datetime
+import boto3
+from boto3.s3.transfer import S3Transfer
+import os
+import time
+import json
 import requests
 from urllib.parse import urljoin
 from tqdm import tqdm
 
 
-WEBSITE = 'http://mridata-web.us-west-2.elasticbeanstalk.com/'
-LOGIN_URL = urljoin(WEBSITE, 'accounts/login/')
-UPLOAD_GE_URL = urljoin(WEBSITE, 'upload_ge/')
-UPLOAD_SIEMENS_URL = urljoin(WEBSITE, 'upload_siemens/')
-UPLOAD_PHILIPS_URL = urljoin(WEBSITE, 'upload_philips/')
-UPLOAD_ISMRMRD_URL = urljoin(WEBSITE, 'upload_ismrmrd/')
+MRIDATA_ORG = 'http://mridata.org/'
+LOGIN_URL = urljoin(MRIDATA_ORG, 'accounts/login/')
+UPLOAD_GE_URL = urljoin(MRIDATA_ORG, 'upload/ge')
+UPLOAD_SIEMENS_URL = urljoin(MRIDATA_ORG, 'upload/siemens')
+UPLOAD_PHILIPS_URL = urljoin(MRIDATA_ORG, 'upload/philips')
+UPLOAD_ISMRMRD_URL = urljoin(MRIDATA_ORG, 'upload/ismrmrd')
+UPLOAD_GET_TEMPORARL_CREDENTIALS_URL = urljoin(MRIDATA_ORG, 'upload/get_temp_credentials')
+
+S3_URL = 'https://mridata-assets.s3.amazonaws.com/'
+S3_BUCKET = 'mridata-assets'
+S3_FOLDER = 'media/uploads'
 
 
 def login(username, password):
@@ -28,16 +37,47 @@ def login(username, password):
 
 
 def download(uuid):
-    
-    r = requests.get(urljoin(WEBSITE, 'data/{}/download'.format(uuid)), stream=True)
+    r = requests.get(urljoin(MRIDATA_ORG, 'download/{}'.format(uuid)), stream=True)
     total_size = int(r.headers.get('content-length', 0))
     chunk_size = 1024
     total_chunks = (total_size + chunk_size - 1) // chunk_size
     with open('{}.h5'.format(uuid), 'wb') as f:
         for chunk in tqdm(r.iter_content(chunk_size=chunk_size), total=total_chunks, unit='KB'):
             if chunk:
-                f.write(chunk)    
+                f.write(chunk)
 
+
+def get_temporary_credentials(session):
+    r = session.get(UPLOAD_GET_TEMPORARL_CREDENTIALS_URL)
+
+    return json.loads(r.content)
+
+
+def hook(t):
+  def inner(bytes_amount):
+    t.update(bytes_amount)
+  return inner
+
+
+def upload_file_to_s3(session, filename):
+
+    credentials = get_temporary_credentials(session)
+    client = boto3.client(
+        's3',
+        aws_access_key_id=credentials['AccessKeyId'],
+        aws_secret_access_key=credentials['SecretAccessKey'],
+        aws_session_token=credentials['SessionToken'],
+    )
+    transfer = S3Transfer(client)
+    s3_filename = os.path.join(S3_FOLDER, str(time.time() * 1000) + filename)
+
+    with tqdm(total=os.path.getsize(filename), unit='B', unit_scale=True) as t:
+        transfer.upload_file(filename, S3_BUCKET, s3_filename,
+                             extra_args={'ACL': 'public-read'}, callback=hook(t))
+
+    s3_url = urljoin(S3_URL, s3_filename)
+    return s3_url
+    
 
 def upload_ismrmrd(username, password,
                    ismrmrd_file, project_name,
@@ -54,28 +94,22 @@ def upload_ismrmrd(username, password,
     if not project_name:
         project_name = input('Enter your project name:')
 
-    with open(ismrmrd_file, 'rb') as f:
-        files = {'ismrmrd_file': f}
-        done = False
-        while not done:
-            print('Uploading {}...'.format(ismrmrd_file))
-            session = login(username, password)
-            session.get(UPLOAD_ISMRMRD_URL)
-            csrftoken = session.cookies['csrftoken']
-            upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
-                           'project_name': project_name,
-                           'references': references, 'comments': comments,
-                           'funding_support': funding_support,
-                           'thumbnail_horizontal_flip': thumbnail_horizontal_flip,
-                           'thumbnail_transpose': thumbnail_transpose,
-                           'thumbnail_vertical_flip': thumbnail_vertical_flip,
-                           'csrfmiddlewaretoken': csrftoken}
-            p = session.post(UPLOAD_ISMRMRD_URL, files=files, data=upload_data)
-            done = '{} uploaded.'.format(ismrmrd_file) in p.text
-            if not done:
-                print('Uploading failed, retrying...')
-    
-    print('Upload successful.')
+    print('Uploading {}...'.format(ismrmrd_file))
+    session = login(username, password)
+    ismrmrd_url = upload_file_to_s3(session, ismrmrd_file)
+
+    session.get(UPLOAD_ISMRMRD_URL)
+    csrftoken = session.cookies['csrftoken']
+    upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
+                   'project_name': project_name,
+                   'references': references, 'comments': comments,
+                   'funding_support': funding_support,
+                   'ismrmrd_file': ismrmrd_url,
+                   'thumbnail_horizontal_flip': thumbnail_horizontal_flip,
+                   'thumbnail_transpose': thumbnail_transpose,
+                   'thumbnail_vertical_flip': thumbnail_vertical_flip,
+                   'csrfmiddlewaretoken': csrftoken}
+    p = session.post(UPLOAD_ISMRMRD_URL, data=upload_data)
 
 
 def upload_ge(username, password,
@@ -93,28 +127,22 @@ def upload_ge(username, password,
     if not project_name:
         project_name = input('Enter your project name:')
 
-    with open(ge_file, 'rb') as f:
-        files = {'ge_file': f}
-        done = False
-        while not done:
-            print('Uploading {}...'.format(ge_file))
-            session = login(username, password)
-            session.get(UPLOAD_GE_URL)
-            csrftoken = session.cookies['csrftoken']
-            upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
-                           'project_name': project_name,
-                           'references': references, 'comments': comments,
-                           'funding_support': funding_support,
-                           'thumbnail_horizontal_flip': thumbnail_horizontal_flip,
-                           'thumbnail_transpose': thumbnail_transpose,
-                           'thumbnail_vertical_flip': thumbnail_vertical_flip,
-                           'csrfmiddlewaretoken': csrftoken}
-            p = session.post(UPLOAD_GE_URL, files=files, data=upload_data)
-            done = '{} uploaded.'.format(ge_file) in p.text
-            if not done:
-                print('Uploading failed, retrying...')
+    print('Uploading {}...'.format(ge_file))
+    session = login(username, password)
+    ge_url = upload_file_to_s3(session, ge_file)
     
-    print('Upload successful.')
+    session.get(UPLOAD_GE_URL)
+    csrftoken = session.cookies['csrftoken']
+    upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
+                   'project_name': project_name,
+                   'references': references, 'comments': comments,
+                   'funding_support': funding_support,
+                   'ge_file': ge_url,
+                   'thumbnail_horizontal_flip': thumbnail_horizontal_flip,
+                   'thumbnail_transpose': thumbnail_transpose,
+                   'thumbnail_vertical_flip': thumbnail_vertical_flip,
+                   'csrfmiddlewaretoken': csrftoken}
+    p = session.post(UPLOAD_GE_URL, files=files, data=upload_data)
 
 
 def upload_siemens(username, password,
@@ -132,28 +160,22 @@ def upload_siemens(username, password,
     if not project_name:
         project_name = input('Enter your project name:')
 
-    with open(siemens_dat_file, 'rb') as f:
-        files = {'siemens_dat_file': f}
-        done = False
-        while not done:
-            print('Uploading {}...'.format(siemens_dat_file))
-            session = login(username, password)
-            session.get(UPLOAD_SIEMENS_URL)
-            csrftoken = session.cookies['csrftoken']
-            upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
-                           'project_name': project_name,
-                           'references': references, 'comments': comments,
-                           'funding_support': funding_support,
-                           'thumbnail_horizontal_flip': thumbnail_horizontal_flip,
-                           'thumbnail_transpose': thumbnail_transpose,
-                           'thumbnail_vertical_flip': thumbnail_vertical_flip,
-                           'csrfmiddlewaretoken': csrftoken}
-            p = session.post(UPLOAD_SIEMENS_URL, files=files, data=upload_data)
-            done = '{} uploaded.'.format(siemens_dat_file) in p.text
-            if not done:
-                print('Uploading failed, retrying...')
+    print('Uploading {}...'.format(siemens_dat_file))
+    session = login(username, password)
+    siemens_dat_url = upload_file_to_s3(session, siemens_dat_file)
     
-    print('Upload successful.')
+    session.get(UPLOAD_SIEMENS_URL)
+    csrftoken = session.cookies['csrftoken']
+    upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
+                   'project_name': project_name,
+                   'references': references, 'comments': comments,
+                   'funding_support': funding_support,
+                   'siemens_dat_file': siemens_dat_url,
+                   'thumbnail_horizontal_flip': thumbnail_horizontal_flip,
+                   'thumbnail_transpose': thumbnail_transpose,
+                   'thumbnail_vertical_flip': thumbnail_vertical_flip,
+                   'csrfmiddlewaretoken': csrftoken}
+    p = session.post(UPLOAD_SIEMENS_URL, files=files, data=upload_data)
 
     
 def upload_philips(username, password,
@@ -175,29 +197,23 @@ def upload_philips(username, password,
     if not project_name:
         project_name = input('Enter your project name:')
 
-    with open(philips_lab_file, 'rb') as f1, open(philips_sin_file, 'rb') as f2, open(philips_raw_file, 'rb') as f3:
-        files = {'philips_lab_file': f1,
-                 'philips_sin_file': f2,
-                 'philips_raw_file': f3}
-        done = False
-        while not done:
-            print('Uploading {} {} {}...'.format(philips_lab_file,
-                                                 philips_sin_file, philips_raw_file))
-            session = login(username, password)
-            session.get(UPLOAD_PHILIPS_URL)
-            csrftoken = session.cookies['csrftoken']
-            upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
-                           'project_name': project_name,
-                           'references': references, 'comments': comments,
-                           'funding_support': funding_support,
-                           'thumbnail_horizontal_flip': thumbnail_horizontal_flip,
-                           'thumbnail_transpose': thumbnail_transpose,
-                           'thumbnail_vertical_flip': thumbnail_vertical_flip,
-                           'csrfmiddlewaretoken': csrftoken}
-            p = session.post(UPLOAD_PHILIPS_URL, files=files, data=upload_data)
-            done = '{} {} {} uploaded.'.format(philips_lab_file,
-                                               philips_sin_file, philips_raw_file) in p.text
-            if not done:
-                print('Uploading failed, retrying...')
+    print('Uploading {} {} {}...'.format(philips_lab_file, philips_sin_file, philips_raw_file))
+    session = login(username, password)
+    philips_lab_url = upload_file_to_s3(session, philips_lab_file)
+    philips_sin_url = upload_file_to_s3(session, philips_sin_file)
+    philips_raw_url = upload_file_to_s3(session, philips_raw_file)
     
-    print('Upload successful.')
+    session.get(UPLOAD_PHILIPS_URL)
+    csrftoken = session.cookies['csrftoken']
+    upload_data = {'anatomy': anatomy, 'fullysampled': fullysampled,
+                   'project_name': project_name,
+                   'references': references, 'comments': comments,
+                   'funding_support': funding_support,
+                   'philips_sin_file': philips_sin_url,
+                   'philips_lab_file': philips_lab_url,
+                   'philips_raw_file': philips_raw_url,
+                   'thumbnail_horizontal_flip': thumbnail_horizontal_flip,
+                   'thumbnail_transpose': thumbnail_transpose,
+                   'thumbnail_vertical_flip': thumbnail_vertical_flip,
+                   'csrfmiddlewaretoken': csrftoken}
+    p = session.post(UPLOAD_PHILIPS_URL, files=files, data=upload_data)
