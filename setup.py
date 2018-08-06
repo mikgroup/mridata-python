@@ -12,7 +12,6 @@ setup(name='mridata',
           'requests',
           'boto3',
           'tqdm',
-          'json',
           'urllib',
       ]
 )
