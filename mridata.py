@@ -1,4 +1,3 @@
-import getpass
 import boto3
 from boto3.s3.transfer import S3Transfer
 import os
@@ -92,7 +91,7 @@ def upload_ismrmrd(username, password,
     if not username:
         username = input('Enter your user name: ')
     if not password:
-        password = getpass.getpass('Enter your password: ')
+        password = input('Enter your password: ')
     if not project_name:
         project_name = input('Enter your project name: ')
 
@@ -125,7 +124,7 @@ def upload_ge(username, password,
     if not username:
         username = input('Enter your user name: ')
     if not password:
-        password = getpass.getpass('Enter your password: ')
+        password = input('Enter your password: ')
     if not project_name:
         project_name = input('Enter your project name: ')
 
@@ -158,7 +157,7 @@ def upload_siemens(username, password,
     if not username:
         username = input('Enter your user name: ')
     if not password:
-        password = getpass.getpass('Enter your password: ')
+        password = input('Enter your password: ')
     if not project_name:
         project_name = input('Enter your project name: ')
 
@@ -195,7 +194,7 @@ def upload_philips(username, password,
     if not username:
         username = input('Enter your user name: ')
     if not password:
-        password = getpass.getpass('Enter your password: ')
+        password = input('Enter your password: ')
     if not project_name:
         project_name = input('Enter your project name: ')
 

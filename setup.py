@@ -14,6 +14,5 @@ setup(name='mridata',
           'tqdm',
           'json',
           'urllib',
-          'getpass'
       ]
 )
