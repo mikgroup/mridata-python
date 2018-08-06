@@ -11,7 +11,6 @@ setup(name='mridata',
       install_requires=[
           'requests',
           'boto3',
-          'tqdm',
-          'urllib',
+          'tqdm'
       ]
 )
