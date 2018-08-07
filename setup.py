@@ -8,7 +8,7 @@ with open("README.md", "r") as f:
     long_description = f.read()
     
 setup(name='mridata',
-      version='0.2.0',
+      version='0.2.1',
       description='Python command line interface for downloading and uploading to mridata.org.',
       long_description=long_description,
       long_description_content_type="text/markdown",
