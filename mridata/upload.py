@@ -3,7 +3,6 @@ import boto3
 import os
 import uuid
 import json
-import requests
 from urllib.parse import urljoin
 from tqdm import tqdm
 from mridata.account import login

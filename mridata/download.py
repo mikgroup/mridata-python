@@ -1,10 +1,6 @@
-import getpass
-import boto3
-from boto3.s3.transfer import S3Transfer
-import os
-import uuid
 import requests
 from tqdm import tqdm
+from urllib.parse import urljoin
 
 
 MRIDATA_ORG = 'http://mridata.org/'
