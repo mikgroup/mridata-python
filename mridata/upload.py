@@ -1,16 +1,16 @@
 import getpass
 import boto3
-from boto3.s3.transfer import S3Transfer
 import os
 import uuid
 import json
 import requests
 from urllib.parse import urljoin
 from tqdm import tqdm
+from mridata.account import login
+from boto3.s3.transfer import S3Transfer
 
 
 MRIDATA_ORG = 'http://mridata.org/'
-LOGIN_URL = urljoin(MRIDATA_ORG, 'accounts/login/')
 UPLOAD_GE_URL = urljoin(MRIDATA_ORG, 'upload/ge')
 UPLOAD_SIEMENS_URL = urljoin(MRIDATA_ORG, 'upload/siemens')
 UPLOAD_PHILIPS_URL = urljoin(MRIDATA_ORG, 'upload/philips')
@@ -22,39 +22,6 @@ S3_BUCKET = 'mridata-assets'
 S3_FOLDER = 'media/uploads'
 
 
-def login(username, password):
-
-    session = requests.Session()
-    session.get(LOGIN_URL)
-    csrftoken = session.cookies['csrftoken']
-    login_data = {'username': username, 'password': password,
-                  'csrfmiddlewaretoken': csrftoken}
-    p = session.post(LOGIN_URL, data=login_data)
-
-    if 'login'in p.url:
-        raise Exception('Cannot find user with the given credentials.')
-
-    return session
-
-
-def download(uuid):
-    r = requests.get(urljoin(MRIDATA_ORG, 'download/{}'.format(uuid)), stream=True)
-    total_size = int(r.headers.get('content-length', 0))
-    chunk_size = 1024
-    total_chunks = (total_size + chunk_size - 1) // chunk_size
-    print('Downloading {}...'.format(uuid))
-    with open('{}.h5'.format(uuid), 'wb') as f:
-        for chunk in tqdm(r.iter_content(chunk_size=chunk_size), total=total_chunks, unit='KB'):
-            if chunk:
-                f.write(chunk)
-
-
-def batch_download(filename):
-    uuids = open(filename).read().splitlines()
-    for uuid in uuids:
-        download(uuid)
-
-
 def get_temporary_credentials(session):
     r = session.get(UPLOAD_GET_TEMPORARL_CREDENTIALS_URL)
 
@@ -62,9 +29,10 @@ def get_temporary_credentials(session):
 
 
 def hook(t):
-  def inner(bytes_amount):
-    t.update(bytes_amount)
-  return inner
+    def inner(bytes_amount):
+        t.update(bytes_amount)
+        
+    return inner
 
 
 def upload_file_to_s3(session, filename):
