@@ -23,9 +23,9 @@ setup(name='mridata',
           'tqdm'
       ],
       packages=['mridata'],
-      classifiers=(
+      classifiers=[
           "Programming Language :: Python :: 3",
           "License :: OSI Approved :: BSD License",
           "Operating System :: OS Independent",
-      ),
+      ],
 )
